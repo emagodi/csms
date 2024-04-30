@@ -106,6 +106,10 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .applicationLineItemsList(application.getApplicationLineItemsList())
                 .status(application.getStatus())
                 .totalPrice(application.getTotalPrice())
+                .createdAt(application.getCreatedAt())
+                .createdBy(application.getCreatedBy())
+                .updatedAt(application.getUpdatedAt())
+                .updatedBy(application.getUpdatedBy())
                 .build();
     }
 

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import zw.co.zetdc.entities.ApplicationLineItems;
 import zw.co.zetdc.enums.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -38,6 +39,12 @@ public class ApplicationResponse {
     private String referenceNo;
     private String msg;
     private Long totalPrice;
+
+
+    private LocalDateTime createdAt;
+    private String createdBy;
+    private LocalDateTime updatedAt;
+    private String updatedBy;
 
 
 }
