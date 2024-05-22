@@ -17,6 +17,8 @@ public enum Status {
 
     INSPECTION_ACCEPTED,
 
-    INSPECTION_REJECTED
+    INSPECTION_REJECTED,
+
+    NOT_APPLIED
 
 }

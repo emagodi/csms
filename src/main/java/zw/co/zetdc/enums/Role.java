@@ -32,7 +32,7 @@ public enum Role {
             Set.of(READ_PRIVILEGE,WRITE_PRIVILEGE,UPDATE_PRIVILEGE)
     ),
     USER(
-            Set.of(READ_PRIVILEGE,WRITE_PRIVILEGE)
+            Set.of(READ_PRIVILEGE,WRITE_PRIVILEGE,UPDATE_PRIVILEGE)
     );
 
     @Getter

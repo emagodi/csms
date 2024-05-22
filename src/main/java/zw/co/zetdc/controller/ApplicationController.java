@@ -50,7 +50,7 @@ public class ApplicationController {
 
     @PutMapping("/approve/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('UPDATE_PRIVILEGE') and hasAnyRole('DISTRICTMANAGER' , 'GENERALMANAGER', 'MANAGINGDIRECTOR' , 'STORESCLERK' , 'PROJECTENGINEER')")
+    @PreAuthorize("hasAuthority('UPDATE_PRIVILEGE') and hasAnyRole('USER','DISTRICTMANAGER' , 'GENERALMANAGER', 'MANAGINGDIRECTOR' , 'STORESCLERK' , 'PROJECTENGINEER')")
     public ResponseEntity<Application> approve(@PathVariable("id") Long id, @RequestBody Application application){
         application.setId(id);
         Application approve = applicationService.approve(application);
