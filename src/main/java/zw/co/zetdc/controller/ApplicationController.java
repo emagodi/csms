@@ -2,6 +2,7 @@ package zw.co.zetdc.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +18,8 @@ import zw.co.zetdc.payload.response.ApplicationResponse;
 import zw.co.zetdc.service.ApplicationService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -59,11 +62,149 @@ public class ApplicationController {
     }
 
 
-    @GetMapping("/district/{district}")
+    @GetMapping("/district/{district}/all")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('DISTRICTMANAGER' , 'STORESCLERK' , 'PROJECTENGINEER')")
     public List<Application> getApplicationsByDistrict(@PathVariable("district") District district) {
-        return applicationService.getApplicationsByDistrict(district);
+        return applicationService.getNumApplicationsByDistrict(district);
+    }
+
+    @GetMapping("/district/{district}")
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('DISTRICTMANAGER')")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<Application> getAllApplicationsForDistrict(
+            @PathVariable("district") District district,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return applicationService.getAllApplicationsByDistrict(district, page, size);
+    }
+
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+    @GetMapping("/district/{district}/inspect/pending")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole( 'PROJECTENGINEER')")
+    public List<Application> getPendingApplicationsByDistrictForInspection(@PathVariable("district") District district) {
+        return applicationService.getPendingApplicationsByDistrictForInspection(district);
+    }
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+    @GetMapping("/district/{district}/inspect/search/{applicationId}/pending")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole('PROJECTENGINEER')")
+    public List<Application> getPendingApplicationsForInspectionBySearch(@PathVariable("district") District district, @PathVariable("applicationId") Long applicationId) {
+        return applicationService.getPendingApplicationForInspectionBySearch(district, applicationId);
+    }
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+    @GetMapping("/district/{district}/stores")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole( 'STORESCLERK' )")
+    public List<Application> getStoresApplicationsByDistrictForInspection(@PathVariable("district") District district) {
+        return applicationService.getAllApplicationsByDistrictForStores(district);
+    }
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+    @GetMapping("/district/{district}/stores/search/{applicationId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole( 'STORESCLERK')")
+    public List<Application> getApplicationsForStoresBySearch(@PathVariable("district") District district, @PathVariable("applicationId") Long applicationId) {
+        return applicationService.getApplicationForStoresBySearch(district, applicationId);
+    }
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+    @GetMapping("/district/{district}/inspect")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole( 'PROJECTENGINEER')")
+    public List<Application> getApplicationsByDistrictForInspection(@PathVariable("district") District district) {
+        return applicationService.getApplicationsByDistrictForInspection(district);
+    }
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+    @GetMapping("/district/{district}/inspect/search/{applicationId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole('PROJECTENGINEER')")
+    public List<Application> getApplicationsForInspectionBySearch(@PathVariable("district") District district, @PathVariable("applicationId") Long applicationId) {
+        return applicationService.getApplicationForInspectionBySearch(district, applicationId);
+    }
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+//    @GetMapping("/district/{district}/pending")
+//    @ResponseStatus(HttpStatus.OK)
+//    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole('PROJECTENGINEER')")
+//    public List<Application> getPendingApplicationsByDistrict(@PathVariable("district") District district) {
+//        return applicationService.getPendingApplicationsByDistrict(district);
+//    }
+
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+    @GetMapping("/district/{district}/pending")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole('DISTRICTMANAGER')")
+    public Page<Application> getPendingApplicationsForDistrict(
+            @PathVariable("district") District district,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return applicationService.getPendingApplicationsByDistrict(district, page, size);
+    }
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+    @GetMapping("/district/{district}/pending/search/{applicationId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole('DISTRICTMANAGER')")
+    public List<Application> getPendingDistrictApplicationsBySearch(@PathVariable("district") District district, @PathVariable("applicationId") Long applicationId) {
+        return applicationService.getPendingDistrictApplicationBySearch(district, applicationId);
+    }
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+    @GetMapping("/district/{district}/search/{applicationId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole('DISTRICTMANAGER')")
+    public List<Application> getDistrictApplicationsBySearch(@PathVariable("district") District district, @PathVariable("applicationId") Long applicationId) {
+        return applicationService.getDistrictApplicationBySearch(district, applicationId);
+    }
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+    @GetMapping("/district/{district}/count")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('DISTRICTMANAGER' , 'STORESCLERK' , 'PROJECTENGINEER')")
+    public Map<Status, Long> getApplicationsByDistrictByCount(@PathVariable("district") District district) {
+        var applications = applicationService.getNumApplicationsByDistrict(district);
+            return applications.stream()
+                    .collect(Collectors.groupingBy(Application::getStatus, Collectors.counting()));
+    }
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
+    @GetMapping("/user/{createdby}/count")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('USER')")
+    public Map<Status, Long> getApplicationsByCountCreatedBy(@PathVariable("createdby") String createdby) {
+        var apps = applicationService.getApplicationByCreatedBy(createdby);
+        return apps.stream()
+                .collect(Collectors.groupingBy(Application::getStatus, Collectors.counting()));
     }
 
 
@@ -94,6 +235,13 @@ public class ApplicationController {
         return applicationService.getApplicationByCreatedBy(createdby);
     }
 
+    @GetMapping("/user/{createdby}/{applicationId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('USER')")
+    public List<Application> getApplicationsBySearch(@PathVariable("createdby") String createdby, @PathVariable("applicationId") Long applicationId) {
+        return applicationService.getApplicationBySearch(createdby, applicationId);
+    }
+
     @GetMapping("/applications/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('USER' , 'DISTRICTMANAGER', 'GENERALMANAGER', 'MANAGINGDIRECTOR', 'STORESCLERK', 'PROJECTENGINEER')")
@@ -105,8 +253,6 @@ public class ApplicationController {
             return ResponseEntity.notFound().build();
         }
     }
-
-
 
     @PutMapping("/applications/{applicationId}/line-items/{lineItemId}")
     @ResponseStatus(HttpStatus.OK)

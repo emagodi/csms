@@ -1,6 +1,8 @@
 package zw.co.zetdc.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import zw.co.zetdc.entities.Application;
 import zw.co.zetdc.entities.ApplicationLineItems;
@@ -13,11 +15,12 @@ import zw.co.zetdc.payload.response.ApplicationResponse;
 import zw.co.zetdc.repository.ApplicationRepository;
 import zw.co.zetdc.service.ApplicationService;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationRepository applicationRepository;
@@ -82,6 +85,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         List<Application> applications = applicationRepository.findAll();
         return applications.stream()
                 .map(this::mapToApplicationResponse)
+                .sorted(Comparator.comparing(ApplicationResponse::getUpdatedBy).reversed())
                 .collect(Collectors.toList());
     }
 
@@ -123,6 +127,11 @@ public class ApplicationServiceImpl implements ApplicationService {
         return aproveApplication;
     }
 
+    @Override
+    public List<Application> getApplicationsByDistrict(District district) {
+        return null;
+    }
+
 
     public Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status) {
         Application existingApplication = applicationRepository.findById(applicationId).orElse(null);
@@ -142,14 +151,189 @@ public class ApplicationServiceImpl implements ApplicationService {
         return null; // or throw an exception if the application is not found
     }
 
+    @Override
+    public List<Application> getApplicationBySearch(String createdby, Long applicationId) {
+
+        var apps = applicationRepository.getApplicationByCreatedBy(createdby);
+
+        var applications = apps.stream()
+                .filter(application -> Objects.equals(application.getId(), applicationId))
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed())
+                .collect(Collectors.toList());
+
+        log.info(String.valueOf(applications.isEmpty()));
+        return applications.isEmpty()
+                ? Collections.singletonList(Application.builder().email(null).build())
+                : applications;
+    }
+
+    @Override
+    public List<Application> getDistrictApplicationBySearch(District district, Long applicationId) {
+        var apps = applicationRepository.findByDistrict(district);
+
+        var applications = apps.stream()
+                .filter(application -> Objects.equals(application.getId(), applicationId))
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed())
+                .collect(Collectors.toList());
+
+        log.info(String.valueOf(applications.isEmpty()));
+        return applications.isEmpty()
+                ? Collections.singletonList(Application.builder().email(null).build())
+                : applications;
+    }
+
+    @Override
+    public Page<Application> getPendingApplicationsByDistrict(District district, int page, int size) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "updatedAt");
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Application> applicationsPage = applicationRepository.findByDistrict(district, pageable);
+
+        List<Application> filteredApplications = applicationsPage.getContent().stream()
+                .filter(app -> Objects.equals(app.getStatus(), Status.PENDING))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(filteredApplications, pageable, applicationsPage.getTotalElements());
+    }
+
+//    @Override
+//    public List<Application> getPendingApplicationsByDistrict(District district) {
+//        return applicationRepository
+//                .findByDistrict(district)
+//                .stream()
+//                .filter(app -> Objects.equals(app.getStatus(), Status.PENDING))
+//                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed())
+//                .collect(Collectors.toList());
+//    }
 
 
 
+    @Override
+    public List<Application> getPendingDistrictApplicationBySearch(District district, Long applicationId) {
+        var apps = applicationRepository.findByDistrict(district);
+
+        var applications = apps.stream()
+                .filter(application -> Objects.equals(application.getId(), applicationId))
+                .filter(application -> Objects.equals(application.getStatus(), Status.PENDING))
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed()).collect(Collectors.toList());
+        log.info(String.valueOf(applications.isEmpty()));
+        return applications.isEmpty()
+                ? Collections.singletonList(Application.builder().email(null).build())
+                : applications;
+    }
+
+    @Override
+    public List<Application> getApplicationsByDistrictForInspection(District district) {
+        final Set<Status> ALLOWED_STATUSES = EnumSet.of(Status.RECEIVED, Status.INSPECTION_REJECTED, Status.INSPECTION_ACCEPTED);
+        var apps = applicationRepository.findByDistrict(district);
+
+        var applications = apps.stream()
+                .filter(application -> ALLOWED_STATUSES.contains(application.getStatus()))
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed()).collect(Collectors.toList());
+        log.info(String.valueOf(applications.isEmpty()));
+        return applications.isEmpty()
+                ? Collections.singletonList(Application.builder().email(null).build())
+                : applications;
+    }
+
+    @Override
+    public List<Application> getApplicationForInspectionBySearch(District district, Long applicationId) {
+        final Set<Status> ALLOWED_STATUSES = EnumSet.of(Status.RECEIVED, Status.INSPECTION_REJECTED, Status.INSPECTION_ACCEPTED);
+        var apps = applicationRepository.findByDistrict(district);
+
+        var applications = apps.stream()
+                .filter(application -> ALLOWED_STATUSES.contains(application.getStatus()))
+                .filter(application -> Objects.equals(application.getId(), applicationId))
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed()).collect(Collectors.toList());
+        log.info(String.valueOf(applications.isEmpty()));
+        return applications.isEmpty()
+                ? Collections.singletonList(Application.builder().email(null).build())
+                : applications;
+    }
+
+    @Override
+    public List<Application> getPendingApplicationsByDistrictForInspection(District district) {
+        var apps = applicationRepository.findByDistrict(district);
+
+        var applications = apps.stream()
+                .filter(application -> Objects.equals(application.getStatus(), Status.RECEIVED))
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed()).collect(Collectors.toList());
+        log.info(String.valueOf(applications.isEmpty()));
+        return applications.isEmpty()
+                ? Collections.singletonList(Application.builder().email(null).build())
+                : applications;
+    }
+
+    @Override
+    public List<Application> getPendingApplicationForInspectionBySearch(District district, Long applicationId) {
+        var apps = applicationRepository.findByDistrict(district);
+
+        var applications = apps.stream()
+                .filter(application -> Objects.equals(application.getId(), applicationId))
+                .filter(application -> Objects.equals(application.getStatus(), Status.RECEIVED))
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed()).collect(Collectors.toList());
+        log.info(String.valueOf(applications.isEmpty()));
+        return applications.isEmpty()
+                ? Collections.singletonList(Application.builder().email(null).build())
+                : applications;
+    }
+
+    @Override
+    public List<Application> getApplicationForStoresBySearch(District district, Long applicationId) {
+        var apps = applicationRepository.findByDistrict(district);
+
+        var applications = apps.stream()
+                .filter(application -> Objects.equals(application.getId(), applicationId))
+                .filter(application -> Objects.equals(application.getStatus(), Status.DISTRICT_APPROVED))
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed()).collect(Collectors.toList());
+        log.info(String.valueOf(applications.isEmpty()));
+        return applications.isEmpty()
+                ? Collections.singletonList(Application.builder().email(null).build())
+                : applications;
+    }
+
+    @Override
+    public List<Application> getAllApplicationsByDistrictForStores(District district) {
+        var apps = applicationRepository.findByDistrict(district);
+
+        var applications = apps.stream()
+                .filter(application -> Objects.equals(application.getStatus(), Status.DISTRICT_APPROVED))
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed()).collect(Collectors.toList());
+        log.info(String.valueOf(applications.isEmpty()));
+        return applications.isEmpty()
+                ? Collections.singletonList(Application.builder().email(null).build())
+                : applications;
+    }
+
+    @Override
+    public List<Application> getNumApplicationsByDistrict(District district) {
+        return applicationRepository
+                .findByDistrict(district)
+                .stream()
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed())
+                .collect(Collectors.toList());
+    }
 
 
+//    public List<Application> getApplicationsByDistrict(District district) {
+//        return applicationRepository
+//                .findByDistrict(district)
+//                .stream()
+//                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed())
+//                .collect(Collectors.toList());
+//
+//    }
 
-    public List<Application> getApplicationsByDistrict(District district) {
-        return applicationRepository.findByDistrict(district);
+    @Override
+    public Page<Application> getAllApplicationsByDistrict(District district, int page, int size) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "updatedAt");
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Application> applicationsPage = applicationRepository.findByDistrict(district, pageable);
+
+        List<Application> filteredApplications = new ArrayList<>(applicationsPage.getContent());
+
+        return new PageImpl<>(filteredApplications, pageable, applicationsPage.getTotalElements());
     }
 
 //    public List<Application> getApplicationsByEmail(String email) {
@@ -157,12 +341,21 @@ public class ApplicationServiceImpl implements ApplicationService {
 //    }
 
     public List<Application> getApplicationsByRegion(Region region) {
-        return applicationRepository.findByRegion(region);
+        return applicationRepository
+                .findByRegion(region)
+                .stream()
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed())
+                .collect(Collectors.toList());
+
     }
 
 
     public List<Application> getApplicationByCreatedBy(String createdby){
-        return applicationRepository.getApplicationByCreatedBy(createdby);
+        return applicationRepository.getApplicationByCreatedBy(createdby)
+                .stream()
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed())
+                .collect(Collectors.toList());
+
     }
 
     public Application getApplicationById(Long id) {
