@@ -39,8 +39,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         application.setMsg(applicationRequest.getMsg());
         application.setNationalId(applicationRequest.getNationalId());
         application.setIdentificationType(applicationRequest.getIdentificationType());
-        application.setHouseNo(application.getHouseNo());
-        application.setSuburb(application.getSuburb());
+        application.setHouseNo(applicationRequest.getHouseNo());
+        application.setSuburb(applicationRequest.getSuburb());
         application.setDepot(applicationRequest.getDepot());
         application.setPhoneNumber(applicationRequest.getPhoneNumber());
         application.setEmail(applicationRequest.getEmail());
