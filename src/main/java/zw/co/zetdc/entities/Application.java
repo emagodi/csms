@@ -28,12 +28,10 @@ public class Application extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Title title;
     private String firstname;
-    private String lasttname;
-    @Enumerated(EnumType.STRING)
-    private JobType jobType;
+    private String lastname;
+    private String jobType;
     private String nationalId;
-    @Enumerated(EnumType.STRING)
-    private IdentificationType identificationType;
+    private String identificationType;
     private String houseNo;
     private String suburb;
     private String depot;
@@ -43,12 +41,9 @@ public class Application extends BaseEntity {
     private List<ApplicationLineItems> applicationLineItemsList;
     @Enumerated(EnumType.STRING)
     private Status status;
-    @Enumerated(EnumType.STRING)
-    private District district;
-    @Enumerated(EnumType.STRING)
-    private Region region;
-    @Enumerated(EnumType.STRING)
-    private ReferenceType referenceType;
+    private String district;
+    private String region;
+    private String referenceType;
     private String referenceNo;
     private String msg;
     private Long totalPrice;
