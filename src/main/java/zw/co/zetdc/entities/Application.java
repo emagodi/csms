@@ -1,6 +1,7 @@
 package zw.co.zetdc.entities;
 
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import zw.co.zetdc.enums.*;
 import zw.co.zetdc.handlers.BaseEntity;
+
 
 import java.lang.ref.Reference;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Application extends BaseEntity {
 
+    @Nullable
     @Enumerated(EnumType.STRING)
     private Title title;
     private String firstname;
