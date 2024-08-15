@@ -34,7 +34,9 @@ public class Application extends BaseEntity {
     private String nationalId;
     @Enumerated(EnumType.STRING)
     private IdentificationType identificationType;
-    private String address;
+    private String houseNo;
+    private String suburb;
+    private String depot;
     private String phoneNumber;
     private String email;
     @OneToMany(cascade = CascadeType.ALL)
