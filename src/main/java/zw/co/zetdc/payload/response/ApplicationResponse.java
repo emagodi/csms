@@ -22,6 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ApplicationResponse {
 
+    private Long id;
     private String title;
     private String firstname;
     private String lastname;
