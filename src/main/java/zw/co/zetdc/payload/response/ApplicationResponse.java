@@ -1,6 +1,7 @@
 package zw.co.zetdc.payload.response;
 
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,21 +22,22 @@ import java.util.List;
 @NoArgsConstructor
 public class ApplicationResponse {
 
-    private Long id;
-    private Title title;
+    private String title;
     private String firstname;
-    private String lasttname;
-    private JobType jobType;
+    private String lastname;
+    private String jobType;
     private String nationalId;
-    private IdentificationType identificationType;
-    private String address;
+    private String identificationType;
+    private String houseNo;
+    private String suburb;
+    private String depot;
     private String phoneNumber;
     private String email;
     private List<ApplicationLineItems> applicationLineItemsList;
     private Status status;
-    private District district;
-    private Region region;
-    private ReferenceType referenceType;
+    private String district;
+    private String region;
+    private String referenceType;
     private String referenceNo;
     private String msg;
     private Long totalPrice;

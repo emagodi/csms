@@ -21,8 +21,7 @@ import java.util.List;
 public class ApplicationRequest {
 
 
-    @Enumerated(EnumType.STRING)
-    private Title title;
+    private String title;
     private String firstname;
     private String lastname;
     private String jobType;

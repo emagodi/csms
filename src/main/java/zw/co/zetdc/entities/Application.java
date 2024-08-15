@@ -24,9 +24,8 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Application extends BaseEntity {
 
-    @Nullable
-    @Enumerated(EnumType.STRING)
-    private Title title;
+
+    private String title;
     private String firstname;
     private String lastname;
     private String jobType;
