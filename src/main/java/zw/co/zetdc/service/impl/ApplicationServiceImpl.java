@@ -193,7 +193,9 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .filter(app -> Objects.equals(app.getStatus(), Status.PENDING))
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(filteredApplications, pageable, applicationsPage.getTotalElements());
+        Page<Application> items = new PageImpl<>(filteredApplications,Pageable.unpaged(),filteredApplications.size());
+
+        return new PageImpl<>(filteredApplications, pageable, items.getTotalElements());
     }
 
 //    @Override
@@ -333,7 +335,9 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         List<Application> filteredApplications = new ArrayList<>(applicationsPage.getContent());
 
-        return new PageImpl<>(filteredApplications, pageable, applicationsPage.getTotalElements());
+        Page<Application> pages = new PageImpl<>(filteredApplications, pageable, applicationsPage.getTotalElements());
+
+        return pages;
     }
 
 //    public List<Application> getApplicationsByEmail(String email) {

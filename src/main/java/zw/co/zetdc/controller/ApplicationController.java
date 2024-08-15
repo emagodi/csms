@@ -65,7 +65,8 @@ public class ApplicationController {
     @GetMapping("/district/{district}/all")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('DISTRICTMANAGER' , 'STORESCLERK' , 'PROJECTENGINEER')")
-    public List<Application> getApplicationsByDistrict(@PathVariable("district") District district) {
+    public List<Application> getApplicationsByDistrict(@PathVariable("district") District district,@RequestParam(defaultValue = "0") int page,
+                                                       @RequestParam(defaultValue = "5") int size) {
         return applicationService.getNumApplicationsByDistrict(district);
     }
 
