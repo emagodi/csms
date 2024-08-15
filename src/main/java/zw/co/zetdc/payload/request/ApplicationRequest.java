@@ -1,11 +1,15 @@
 package zw.co.zetdc.payload.request;
 
+import jakarta.annotation.Nullable;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import zw.co.zetdc.entities.ApplicationLineItems;
 import zw.co.zetdc.enums.*;
 
 import java.util.List;
@@ -16,45 +20,28 @@ import java.util.List;
 @Data
 public class ApplicationRequest {
 
+
     @Enumerated(EnumType.STRING)
     private Title title;
-
     private String firstname;
     private String lastname;
-
-    @Enumerated(EnumType.STRING)
-    private JobType jobType;
-
-    @Enumerated(EnumType.STRING)
-    private ReferenceType referenceType;
-
-    private String referenceNo;
-
-    private String msg;
-
+    private String jobType;
     private String nationalId;
-
-    @Enumerated(EnumType.STRING)
-    private IdentificationType identificationType;
-
-    private String address;
-
+    private String identificationType;
+    private String houseNo;
+    private String suburb;
+    private String depot;
     private String phoneNumber;
-
     private String email;
-
-    private List<ApplicationLineItemsDto> applicationLineItemsDtoList;
-
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<ApplicationLineItems> applicationLineItemsList;
     @Enumerated(EnumType.STRING)
     private Status status;
-
-    @Enumerated(EnumType.STRING)
-    private District district;
-
-    @Enumerated(EnumType.STRING)
-    private Region region;
-
+    private String district;
+    private String region;
+    private String referenceType;
+    private String referenceNo;
+    private String msg;
     private Long totalPrice;
-
 
 }
