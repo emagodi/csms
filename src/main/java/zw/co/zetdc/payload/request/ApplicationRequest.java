@@ -1,6 +1,5 @@
 package zw.co.zetdc.payload.request;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,7 +19,6 @@ import java.util.List;
 @Data
 public class ApplicationRequest {
 
-
     private String title;
     private String firstname;
     private String lastname;
@@ -33,7 +31,7 @@ public class ApplicationRequest {
     private String phoneNumber;
     private String email;
     @OneToMany(cascade = CascadeType.ALL)
-    private List<ApplicationLineItems> applicationLineItemsList;
+    private List<ApplicationLineItemsDto> applicationLineItemsDtoList;
     @Enumerated(EnumType.STRING)
     private Status status;
     private String district;
@@ -42,5 +40,6 @@ public class ApplicationRequest {
     private String referenceNo;
     private String msg;
     private Long totalPrice;
+
 
 }
