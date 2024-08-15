@@ -32,28 +32,22 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         application.setTitle(applicationRequest.getTitle());
         application.setFirstname(applicationRequest.getFirstname());
-        application.setLasttname(applicationRequest.getLastname());
+        application.setLastname(applicationRequest.getLastname());
         application.setJobType(applicationRequest.getJobType());
         application.setReferenceType(applicationRequest.getReferenceType());
         application.setReferenceNo(applicationRequest.getReferenceNo());
         application.setMsg(applicationRequest.getMsg());
         application.setNationalId(applicationRequest.getNationalId());
         application.setIdentificationType(applicationRequest.getIdentificationType());
-        application.setAddress(applicationRequest.getAddress());
+        application.setHouseNo(application.getHouseNo());
+        application.setSuburb(application.getSuburb());
+        application.setDepot(applicationRequest.getDepot());
         application.setPhoneNumber(applicationRequest.getPhoneNumber());
         application.setEmail(applicationRequest.getEmail());
         application.setDistrict(applicationRequest.getDistrict());
-//        application.setRegion(applicationRequest.getRegion());
+        application.setRegion(applicationRequest.getRegion());
         application.setStatus(applicationRequest.getStatus());
         application.setTotalPrice(applicationRequest.getTotalPrice());
-
-
-
-        // Determine the corresponding region based on the district
-        Region region = applicationRequest.getDistrict().getRegion();
-        // Set the region in the application
-        application.setRegion(region);
-
 
 
         List<ApplicationLineItems> applicationLineItems = applicationRequest.getApplicationLineItemsDtoList()
@@ -95,14 +89,16 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .id(application.getId())
                 .title(application.getTitle())
                 .firstname(application.getFirstname())
-                .lasttname(application.getLasttname())
+                .lastname(application.getLastname())
                 .jobType(application.getJobType())
                 .referenceType(application.getReferenceType())
                 .referenceNo(application.getReferenceNo())
                 .msg(application.getMsg())
                 .nationalId(application.getNationalId())
                 .identificationType(application.getIdentificationType())
-                .address(application.getAddress())
+                .houseNo(application.getHouseNo())
+                .suburb(application.getSuburb())
+                .depot(application.getDepot())
                 .phoneNumber(application.getPhoneNumber())
                 .email(application.getEmail())
                 .district(application.getDistrict())
