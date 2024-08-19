@@ -312,6 +312,16 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean isRefNoPresent(String refNo) {
+        return applicationRepository.existsByReferenceNo(refNo);
+    }
+
+    @Override
+    public Application getApplicationByPjob(String pjob) {
+        return applicationRepository.findByReferenceNo(pjob).orElse(null);
+    }
+
 
 //    public List<Application> getApplicationsByDistrict(District district) {
 //        return applicationRepository

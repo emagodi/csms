@@ -8,6 +8,7 @@ import zw.co.zetdc.enums.District;
 import zw.co.zetdc.enums.Region;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
     List<Application> findByDistrict(District district);
@@ -20,4 +21,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     public List<Application> getApplicationByCreatedBy(String createdby);
 
 
+    public boolean existsByReferenceNo(String refNo);
+
+    Optional<Application> findByReferenceNo(String pjob);
 }

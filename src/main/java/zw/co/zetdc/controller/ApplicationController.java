@@ -123,6 +123,16 @@ public class ApplicationController {
     /**
      * Author: Kudakwashe E Koti
      * */
+    @GetMapping("/ispresent/{refNo}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole( 'USER')")
+    public boolean isPresent(@PathVariable("refNo") String refNo) {
+        return applicationService.isRefNoPresent(refNo);
+    }
+
+    /**
+     * Author: Kudakwashe E Koti
+     * */
     @GetMapping("/district/{district}/inspect")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole( 'PROJECTENGINEER')")
@@ -248,6 +258,18 @@ public class ApplicationController {
     @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('USER' , 'DISTRICTMANAGER', 'GENERALMANAGER', 'MANAGINGDIRECTOR', 'STORESCLERK', 'PROJECTENGINEER')")
     public ResponseEntity<Application> getApplicationById(@PathVariable Long id) {
         Application application = applicationService.getApplicationById(id);
+        if (application != null) {
+            return ResponseEntity.ok(application);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/applications/pjob/{pjob}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('USER' , 'DISTRICTMANAGER', 'GENERALMANAGER', 'MANAGINGDIRECTOR', 'STORESCLERK', 'PROJECTENGINEER')")
+    public ResponseEntity<Application> getApplicationByPjob(@PathVariable String pjob) {
+        Application application = applicationService.getApplicationByPjob(pjob);
         if (application != null) {
             return ResponseEntity.ok(application);
         } else {

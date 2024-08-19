@@ -59,4 +59,8 @@ public interface ApplicationService {
     List<Application> getAllApplicationsByDistrictForStores(District district);
 
     List<Application> getNumApplicationsByDistrict(District district);
+
+    boolean isRefNoPresent(String refNo);
+
+    Application getApplicationByPjob(String pjob);
 }
