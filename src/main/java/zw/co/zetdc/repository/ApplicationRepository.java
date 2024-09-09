@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
-    List<Application> findByDistrict(District district);
+    List<Application> findByDistrict(String district);
 //    List<Application> findByEmail(String email);
 
-    Page<Application> findByDistrict(District district, Pageable page);
+    Page<Application> findByDistrict(String district, Pageable page);
 
     List<Application> findByRegion(Region region);
 

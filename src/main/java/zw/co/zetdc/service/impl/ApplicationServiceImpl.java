@@ -165,7 +165,8 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<Application> getDistrictApplicationBySearch(District district, Long applicationId) {
-        var apps = applicationRepository.findByDistrict(district);
+
+        var apps = applicationRepository.findByDistrict(district.toString());
 
         var applications = apps.stream()
                 .filter(application -> Objects.equals(application.getId(), applicationId))
@@ -183,7 +184,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         Sort sort = Sort.by(Sort.Direction.DESC, "updatedAt");
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Application> applicationsPage = applicationRepository.findByDistrict(district, pageable);
+        Page<Application> applicationsPage = applicationRepository.findByDistrict(district.toString(), pageable);
 
         List<Application> filteredApplications = applicationsPage.getContent().stream()
                 .filter(app -> Objects.equals(app.getStatus(), Status.PENDING))
@@ -208,7 +209,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<Application> getPendingDistrictApplicationBySearch(District district, Long applicationId) {
-        var apps = applicationRepository.findByDistrict(district);
+        var apps = applicationRepository.findByDistrict(district.toString());
 
         var applications = apps.stream()
                 .filter(application -> Objects.equals(application.getId(), applicationId))
@@ -223,7 +224,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public List<Application> getApplicationsByDistrictForInspection(District district) {
         final Set<Status> ALLOWED_STATUSES = EnumSet.of(Status.RECEIVED, Status.INSPECTION_REJECTED, Status.INSPECTION_ACCEPTED);
-        var apps = applicationRepository.findByDistrict(district);
+        var apps = applicationRepository.findByDistrict(district.toString());
 
         var applications = apps.stream()
                 .filter(application -> ALLOWED_STATUSES.contains(application.getStatus()))
@@ -237,7 +238,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public List<Application> getApplicationForInspectionBySearch(District district, Long applicationId) {
         final Set<Status> ALLOWED_STATUSES = EnumSet.of(Status.RECEIVED, Status.INSPECTION_REJECTED, Status.INSPECTION_ACCEPTED);
-        var apps = applicationRepository.findByDistrict(district);
+        var apps = applicationRepository.findByDistrict(district.toString());
 
         var applications = apps.stream()
                 .filter(application -> ALLOWED_STATUSES.contains(application.getStatus()))
@@ -251,7 +252,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<Application> getPendingApplicationsByDistrictForInspection(District district) {
-        var apps = applicationRepository.findByDistrict(district);
+        var apps = applicationRepository.findByDistrict(district.toString());
 
         var applications = apps.stream()
                 .filter(application -> Objects.equals(application.getStatus(), Status.RECEIVED))
@@ -264,7 +265,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<Application> getPendingApplicationForInspectionBySearch(District district, Long applicationId) {
-        var apps = applicationRepository.findByDistrict(district);
+        var apps = applicationRepository.findByDistrict(district.toString());
 
         var applications = apps.stream()
                 .filter(application -> Objects.equals(application.getId(), applicationId))
@@ -278,7 +279,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<Application> getApplicationForStoresBySearch(District district, Long applicationId) {
-        var apps = applicationRepository.findByDistrict(district);
+        var apps = applicationRepository.findByDistrict(district.toString());
 
         var applications = apps.stream()
                 .filter(application -> Objects.equals(application.getId(), applicationId))
@@ -292,7 +293,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<Application> getAllApplicationsByDistrictForStores(District district) {
-        var apps = applicationRepository.findByDistrict(district);
+        var apps = applicationRepository.findByDistrict(district.toString());
 
         var applications = apps.stream()
                 .filter(application -> Objects.equals(application.getStatus(), Status.DISTRICT_APPROVED))
@@ -305,8 +306,10 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<Application> getNumApplicationsByDistrict(District district) {
-        return applicationRepository
-                .findByDistrict(district)
+        String d = district.toString();
+        log.info(d);
+       return applicationRepository
+                .findByDistrict(d)
                 .stream()
                 .sorted(Comparator.comparing(Application::getUpdatedBy).reversed())
                 .collect(Collectors.toList());
@@ -337,7 +340,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         Sort sort = Sort.by(Sort.Direction.DESC, "updatedAt");
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Application> applicationsPage = applicationRepository.findByDistrict(district, pageable);
+        Page<Application> applicationsPage = applicationRepository.findByDistrict(district.toString(), pageable);
 
         List<Application> filteredApplications = new ArrayList<>(applicationsPage.getContent());
 

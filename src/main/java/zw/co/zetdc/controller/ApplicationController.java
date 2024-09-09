@@ -201,7 +201,9 @@ public class ApplicationController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('DISTRICTMANAGER' , 'STORESCLERK' , 'PROJECTENGINEER')")
     public Map<Status, Long> getApplicationsByDistrictByCount(@PathVariable("district") District district) {
+        System.out.println("we are here");
         var applications = applicationService.getNumApplicationsByDistrict(district);
+
             return applications.stream()
                     .collect(Collectors.groupingBy(Application::getStatus, Collectors.counting()));
     }
