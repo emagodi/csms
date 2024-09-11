@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import zw.co.zetdc.email.StatusChangeService;
 import zw.co.zetdc.entities.Application;
 import zw.co.zetdc.enums.District;
 import zw.co.zetdc.enums.Region;
@@ -29,8 +28,6 @@ public class ApplicationController {
 
     private final ApplicationService applicationService;
 
-
-    private final StatusChangeService statusChangeService;
 
 
 
@@ -237,7 +234,7 @@ public class ApplicationController {
     @PutMapping("approve/{id}/{email}")
     @PreAuthorize("hasAuthority('UPDATE_PRIVILEGE') and hasRole('DISTRICTMANAGER')")
     public ResponseEntity<String> updateStatus(@PathVariable Long id, @PathVariable String email, @RequestBody Status status) {
-        statusChangeService.updateStatusAndNotify(id, status, email);
+
         return ResponseEntity.ok("Status updated successfully");
     }
 

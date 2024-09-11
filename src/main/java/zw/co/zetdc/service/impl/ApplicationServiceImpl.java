@@ -14,6 +14,7 @@ import zw.co.zetdc.payload.request.ApplicationLineItemsDto;
 import zw.co.zetdc.payload.response.ApplicationResponse;
 import zw.co.zetdc.repository.ApplicationRepository;
 import zw.co.zetdc.service.ApplicationService;
+import zw.co.zetdc.service.EmailService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
 public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationRepository applicationRepository;
+
+    private final EmailService emailService;
 
 
     @Override
@@ -58,6 +61,9 @@ public class ApplicationServiceImpl implements ApplicationService {
         application.setApplicationLineItemsList(applicationLineItems);
         applicationRepository.save(application);
 
+//        String subject = "ZETDC Customer Supplied Material Scheme";
+//        String body = "Dear User, You Application Was Submitted To ZETDC Successfully. Your Reference Is " + application.getReferenceNo() + " Status Is " + application.getStatus();
+//        emailService.sendEmail(application.getEmail(), subject, body);
     }
 
     private ApplicationLineItems mapToDto(ApplicationLineItemsDto applicationLineItemsDto) {
@@ -120,6 +126,11 @@ public class ApplicationServiceImpl implements ApplicationService {
         existingApplication.setStatus(application.getStatus());
         existingApplication.setMsg(application.getMsg());
         Application aproveApplication = applicationRepository.save(existingApplication);
+
+//        log.info(existingApplication.getEmail());
+//        String subject = "ZETDC Customer Supplied Material Scheme";
+//        String body = "Dear User, There Is a Status Update To Your Application Reference ";
+//        emailService.sendEmail(existingApplication.getEmail(), subject, body);
         return aproveApplication;
     }
 

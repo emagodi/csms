@@ -28,6 +28,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
+
+    // private final EmailService emailService;
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder()
@@ -40,6 +42,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .region(request.getDistrict().getRegion())
                 .build();
         user = userRepository.save(user);
+//        String subject = "ZETDC Customer Supplied Material Scheme";
+//        String body = "Your User Account Created Successfully With Email Address: " + user.getEmail();
+//        emailService.sendEmail(user.getEmail(), subject, body);
         var jwt = jwtService.generateToken(user);
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
