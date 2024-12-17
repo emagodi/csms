@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import zw.co.zetdc.enums.District;
 import zw.co.zetdc.enums.Region;
+import zw.co.zetdc.enums.Role;
 
 import java.util.List;
 
@@ -16,10 +17,29 @@ import java.util.List;
 @AllArgsConstructor
 public class AuthenticationResponse {
     private  Long id;
+
+    private String firstname;
+
+    private String lastname;
+
+    private String password;
+
+
     private String email;
+
     private List<String> roles;
+
     private District district;
+
     private Region region;
+
+    private String reference;
+
+    private String identity;
+
+    private String identityType;
+
+    private boolean temporaryPassword;
 
     @JsonProperty("access_token")
     private String accessToken;
@@ -27,5 +47,9 @@ public class AuthenticationResponse {
     private String refreshToken;
     @JsonProperty("token_type")
     private String tokenType;
+
+    private String message;
+
+    private boolean createdByAdmin;
 
 }
