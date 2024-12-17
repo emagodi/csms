@@ -32,17 +32,25 @@ public class RegisterRequest {
     @Email(message = "email format is not valid")
     private String email;
 
-    @NotBlank(message = "password is required")
-    @StrongPassword
-    private String password;
+//    @NotBlank(message = "password is required")
+//    @StrongPassword
+//    private String password;
 
     @NotNull
     private Role role;
 
-    @Enumerated(EnumType.STRING)
+
     private District district;
-    @Enumerated(EnumType.STRING)
+
+
     private Region region;
+
+
+    private String reference;
+
+    private String identity;
+
+    private String identityType;
 
 
 
