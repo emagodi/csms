@@ -46,7 +46,7 @@ public class User implements UserDetails { // make our app User a spring securit
     @Enumerated(EnumType.STRING)
     private Region region;
 
-
+    @Column(unique = true)
     private String reference;
 
     private String identity;
