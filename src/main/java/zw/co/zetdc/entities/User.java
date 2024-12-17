@@ -27,10 +27,14 @@ public class User implements UserDetails { // make our app User a spring securit
     @Id
     @GeneratedValue
     private Long id;
+
     private String firstname;
+
     private String lastname;
+
     @Column(unique = true)
     private String email;
+
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -41,6 +45,21 @@ public class User implements UserDetails { // make our app User a spring securit
 
     @Enumerated(EnumType.STRING)
     private Region region;
+
+
+    private String reference;
+
+    private String identity;
+
+    private String identityType;
+
+
+    @OneToOne(mappedBy = "user")
+    private ForgotPassword forgotPassword;
+
+    private boolean temporaryPassword;
+
+
 
     // we should return a list of roles
     @Override
