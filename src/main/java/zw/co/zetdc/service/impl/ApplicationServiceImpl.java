@@ -130,7 +130,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         log.info(existingApplication.getEmail());
         String subject = "ZETDC Customer Supplied Material Scheme";
         String body = "Dear User, There Is a Status Update To Your Application Reference ";
-        emailService.sendEmail(existingApplication.getEmail(), subject, body);
+//        emailService.sendEmail(existingApplication.getEmail(), subject, body);
         return aproveApplication;
     }
 
