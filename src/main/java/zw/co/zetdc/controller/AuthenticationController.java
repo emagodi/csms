@@ -80,7 +80,7 @@ public class AuthenticationController {
             if (message != null) {
                 // Return Conflict status with a plain string message
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Email already exists: " + message); // Return the duplicate entry message
+                        .body("Email and or Reference already exists: " + message); // Return the duplicate entry message
             }
             // Handle other DataIntegrityViolationException cases if necessary
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -209,7 +209,7 @@ public class AuthenticationController {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(errorMessage);
         if (matcher.find()) {
-            return "Email already exists: " + matcher.group(0); // Return the matched duplicate entry message
+            return " " + matcher.group(0); // Return the matched duplicate entry message
         }
         return null; // Return null if no match is found
     }
