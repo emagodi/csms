@@ -1,23 +1,30 @@
 package zw.co.zetdc.service;
 
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import zw.co.zetdc.payload.request.MailBody;
+
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
 
-    public void sendEmail(String to, String subject, String body) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(body);
-        mailSender.send(message);
+    private final JavaMailSender javaMailSender;
+
+    public void sendSimpleMessage(MailBody mailBody){
+
+        SimpleMailMessage message =  new SimpleMailMessage();
+        message.setTo(mailBody.to());
+        message.setFrom("magodiedwin@gmail.com");
+        message.setSubject(mailBody.subject());
+        message.setText(mailBody.text());
+
+        javaMailSender.send(message);
+
     }
+
 }
