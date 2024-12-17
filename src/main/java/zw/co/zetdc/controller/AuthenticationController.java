@@ -1,8 +1,14 @@
 package zw.co.zetdc.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import zw.co.zetdc.entities.User;
+import zw.co.zetdc.exception.AuthenticationException;
 import zw.co.zetdc.payload.request.AuthenticationRequest;
 import zw.co.zetdc.payload.request.RefreshTokenRequest;
 import zw.co.zetdc.payload.request.RegisterRequest;
+import zw.co.zetdc.payload.request.UserUpdateRequest;
 import zw.co.zetdc.payload.response.AuthenticationResponse;
 import zw.co.zetdc.payload.response.RefreshTokenResponse;
 import zw.co.zetdc.service.AuthenticationService;
@@ -26,8 +32,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-@Tag(name = "Authentication", description = "The Authentication API. Contains operations like login, logout, refresh-token etc.")
+
+@Tag(name = "AUTHENTICATION", description = "The Authentication APIs. Contains operations like login, logout, refresh-token etc.")
 @RestController
 @RequestMapping("/api/v1/auth")
 @SecurityRequirements() /*
@@ -35,6 +45,7 @@ This API won't have any security requirements. Therefore, we need to override th
 with @SecurityRequirements()
 */
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -43,14 +54,38 @@ public class AuthenticationController {
     private final JwtService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody RegisterRequest request) {
-        AuthenticationResponse authenticationResponse = authenticationService.register(request);
-        ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getAccessToken());
-        ResponseCookie refreshTokenCookie = refreshTokenService.generateRefreshTokenCookie(authenticationResponse.getRefreshToken());
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .header(HttpHeaders.SET_COOKIE,refreshTokenCookie.toString())
-                .body(authenticationResponse);
+    @Operation(summary = "Register New User",
+            description = "Create new user by posting firstname, lastname, email, password, role, reference. ")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request,
+                                      @RequestParam boolean createdByAdmin,
+                                      @RequestHeader Map<String, String> headers) {
+        String authorizationValue = null;
+
+        if (headers.get("authorization") != null && headers.get("authorization").length() > 7) {
+            authorizationValue = headers.get("authorization").substring(7);
+        }
+        System.out.println(createdByAdmin);
+        try {
+            AuthenticationResponse authenticationResponse = authenticationService.register(request, createdByAdmin, authorizationValue);
+
+            ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getAccessToken());
+            ResponseCookie refreshTokenCookie = refreshTokenService.generateRefreshTokenCookie(authenticationResponse.getRefreshToken());
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                    .body(authenticationResponse); // Return the authentication response
+        } catch (DataIntegrityViolationException e) {
+            String message = extractDuplicateEntryMessage(e.getMessage());
+            if (message != null) {
+                // Return Conflict status with a plain string message
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Email already exists: " + message); // Return the duplicate entry message
+            }
+            // Handle other DataIntegrityViolationException cases if necessary
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred: " + e.getMessage()); // Return error message as a string
+        }
     }
 
     @PostMapping("/authenticate")
@@ -67,14 +102,24 @@ public class AuthenticationController {
                     )
             }
     )
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
-        ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getAccessToken());
-        ResponseCookie refreshTokenCookie = refreshTokenService.generateRefreshTokenCookie(authenticationResponse.getRefreshToken());
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE,jwtCookie.toString())
-                .header(HttpHeaders.SET_COOKIE,refreshTokenCookie.toString())
-                .body(authenticationResponse);
+
+    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request) {
+        log.info("Received authentication request for email: {}", request.getEmail());
+
+        try {
+            AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
+            ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getAccessToken());
+            ResponseCookie refreshTokenCookie = refreshTokenService.generateRefreshTokenCookie(authenticationResponse.getRefreshToken());
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                    .body(authenticationResponse);
+        } catch (AuthenticationException e) {
+            log.error("Authentication failed for email: {}", request.getEmail(), e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid credentials");
+        }
     }
     @PostMapping("/refresh-token")
     public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
@@ -96,19 +141,96 @@ public class AuthenticationController {
         return     authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword()));
     }
-
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request){
+    @Operation(summary = "Logout",
+            description = "End point to logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
         String refreshToken = refreshTokenService.getRefreshTokenFromCookies(request);
-        if(refreshToken != null) {
-           refreshTokenService.deleteByToken(refreshToken);
+
+        if (refreshToken != null) {
+            try {
+                refreshTokenService.deleteByToken(refreshToken);
+                log.info("Successfully deleted refresh token: {}", refreshToken);
+            } catch (Exception e) {
+                log.error("Error deleting refresh token: {}", refreshToken, e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            log.warn("No refresh token found in cookies for logout");
         }
+
         ResponseCookie jwtCookie = jwtService.getCleanJwtCookie();
         ResponseCookie refreshTokenCookie = refreshTokenService.getCleanRefreshTokenCookie();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE,jwtCookie.toString())
-                .header(HttpHeaders.SET_COOKIE,refreshTokenCookie.toString())
-                .build();
 
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .build();
     }
+
+    @GetMapping("user/id/{id}")
+    @Operation(summary = "Find User By User Id",
+            description = "This endpoint will allow you to get a particular user by their user id.")
+    // @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('ADMIN' , 'SUPERADMIN', 'TEACHER')")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        User user = authenticationService.getUserById(id);
+        if (user != null) {
+            return ResponseEntity.ok(user); // Return 200 OK with user entity
+        } else {
+            String notFoundMessage = "User not found for ID: " + id;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(notFoundMessage); // Return 404 Not Found with message
+        }
+    }
+    @PutMapping("update/id/{userId}")
+    @Operation(summary = "Endpoint to update user by id",
+            description = "This endpoint will allow you to update user by id. If you are updating to an already existing user it will show email already exists message")
+    public ResponseEntity<?> updateUser(
+            @PathVariable Long userId,
+            @RequestBody UserUpdateRequest userUpdateRequest) {
+        System.out.println(userUpdateRequest);
+        try {
+            User updatedUser = authenticationService.updateUser(userId, userUpdateRequest);
+            return ResponseEntity.ok(updatedUser); // Return the updated User entity
+        } catch (DataIntegrityViolationException e) {
+            String message = extractDuplicateEntryMessage(e.getMessage());
+            if (message != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(message); // Return the extracted duplicate entry message
+            }
+            // Handle other DataIntegrityViolationException cases if necessary
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred: " + e.getMessage()); // Include original message for debugging
+        }
+    }
+
+    // Extract duplicate entry message using regex
+    private String extractDuplicateEntryMessage(String errorMessage) {
+        String regex = "Duplicate entry '([^']+)'";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(errorMessage);
+        if (matcher.find()) {
+            return "Email already exists: " + matcher.group(0); // Return the matched duplicate entry message
+        }
+        return null; // Return null if no match is found
+    }
+
+    @PostMapping("/change-password/{email}/{currentPassword}/{newPassword}")
+    @Operation(summary = "Endpoint to change password",
+            description = "This endpoint will allow you to change password by entering old password and new password. If the two are different, error is displayed")
+    public ResponseEntity<String> changePassword(
+            @PathVariable String email,
+            @PathVariable String currentPassword,
+            @PathVariable String newPassword) {
+        try {
+            authenticationService.changePassword(email, currentPassword, newPassword);
+            return ResponseEntity.ok("Password changed successfully");
+        } catch (IllegalArgumentException e) {
+            // Return the message for invalid old password
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            // Handle the specific case for invalid old password
+            return ResponseEntity.badRequest().body("Invalid old password.");
+        }
+    }
+
 }
