@@ -99,6 +99,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .id(user.getId())
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
+                .password(generatedPassword)
                 .refreshToken(refreshToken.getToken())
                 .roles(roles)
                 .district(user.getDistrict())
