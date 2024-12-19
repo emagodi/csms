@@ -137,6 +137,16 @@ public class ApplicationController {
         return applicationService.getApplicationsByDistrictForInspection(district);
     }
 
+
+
+    @GetMapping("/district/{district}/stores/all")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole( 'STORESCLERK')")
+    public List<Application> getApplicationsByDistrictForStores(@PathVariable("district") District district) {
+        return applicationService.getApplicationsByDistrictForStores(district);
+    }
+
+
     /**
      * Author: Kudakwashe E Koti
      * */

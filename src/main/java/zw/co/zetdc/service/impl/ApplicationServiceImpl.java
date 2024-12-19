@@ -246,6 +246,26 @@ public class ApplicationServiceImpl implements ApplicationService {
                 : applications;
     }
 
+
+
+
+    @Override
+    public List<Application> getApplicationsByDistrictForStores(District district) {
+        final Set<Status> ALLOWED_STATUSES = EnumSet.of(Status.RECEIVED, Status.INSPECTION_REJECTED, Status.INSPECTION_ACCEPTED, Status.DISTRICT_APPROVED, Status.WAITING_INSPECTION);
+        var apps = applicationRepository.findByDistrict(district.toString());
+
+        var applications = apps.stream()
+                .filter(application -> ALLOWED_STATUSES.contains(application.getStatus()))
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed()).collect(Collectors.toList());
+        log.info(String.valueOf(applications.isEmpty()));
+        return applications.isEmpty()
+                ? Collections.singletonList(Application.builder().email(null).build())
+                : applications;
+    }
+
+
+
+
     @Override
     public List<Application> getApplicationForInspectionBySearch(District district, Long applicationId) {
         final Set<Status> ALLOWED_STATUSES = EnumSet.of(Status.RECEIVED, Status.INSPECTION_REJECTED, Status.INSPECTION_ACCEPTED);

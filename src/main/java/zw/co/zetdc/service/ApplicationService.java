@@ -63,4 +63,6 @@ public interface ApplicationService {
     boolean isRefNoPresent(String refNo);
 
     Application getApplicationByPjob(String pjob);
+
+    public List<Application> getApplicationsByDistrictForStores(District district);
 }

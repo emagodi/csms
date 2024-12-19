@@ -19,6 +19,8 @@ public enum Status {
 
     INSPECTION_REJECTED,
 
-    NOT_APPLIED
+    NOT_APPLIED,
+
+    WAITING_INSPECTION
 
 }
