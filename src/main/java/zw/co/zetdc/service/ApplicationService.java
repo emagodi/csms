@@ -65,4 +65,6 @@ public interface ApplicationService {
     Application getApplicationByPjob(String pjob);
 
     public List<Application> getApplicationsByDistrictForStores(District district);
+
+    public List<Application> getApplicationsByDistrictForStoresUpload(District district);
 }

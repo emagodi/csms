@@ -147,6 +147,14 @@ public class ApplicationController {
     }
 
 
+    @GetMapping("/district/{district}/stores/upload")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole( 'STORESCLERK')")
+    public List<Application> getApplicationsByDistrictForStoresUpload(@PathVariable("district") District district) {
+        return applicationService.getApplicationsByDistrictForStoresUpload(district);
+    }
+
+
     /**
      * Author: Kudakwashe E Koti
      * */
