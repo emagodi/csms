@@ -28,4 +28,10 @@ public class ApplicationLineItems {
     private Status status;
     private String reason;
 
+    private Integer totalQuantity;
+
+    private BigDecimal itemTotalPrice;
+
+    private String currency;
+
 }

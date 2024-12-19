@@ -20,4 +20,10 @@ public class ApplicationLineItemsDto {
     private BigDecimal price;
     private Status status;
     private String reason;
+
+    private Integer totalQuantity;
+
+    private BigDecimal itemTotalPrice;
+
+    private String currency;
 }
