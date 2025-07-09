@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.Instant;
 
-
 @Component @Slf4j
 public class Http401UnauthorizedEntryPoint implements AuthenticationEntryPoint {
     @Override
@@ -41,3 +40,4 @@ public class Http401UnauthorizedEntryPoint implements AuthenticationEntryPoint {
         mapper.writeValue(response.getOutputStream(), body);
     }
 }
+

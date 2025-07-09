@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Builder
@@ -59,6 +60,8 @@ public class User implements UserDetails { // make our app User a spring securit
 
     private boolean temporaryPassword;
 
+    private String otp;
+    private LocalDateTime otpExpiry;
 
 
     // we should return a list of roles

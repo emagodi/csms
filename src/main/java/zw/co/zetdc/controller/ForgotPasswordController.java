@@ -14,7 +14,7 @@ import zw.co.zetdc.payload.request.ChangePassword;
 import zw.co.zetdc.payload.request.MailBody;
 import zw.co.zetdc.repository.ForgotPasswordRepository;
 import zw.co.zetdc.repository.UserRepository;
-import zw.co.zetdc.service.EmailService;
+import zw.co.zetdc.service.impl.EmailServiceImpl;
 
 
 import java.time.Instant;
@@ -31,7 +31,7 @@ public class ForgotPasswordController {
 
 
     private final UserRepository userRepository;
-    private final EmailService emailService;
+    private final EmailServiceImpl emailService;
 
     private final ForgotPasswordRepository forgotPasswordRepository;
 

@@ -9,7 +9,7 @@ import zw.co.zetdc.payload.response.AuthenticationResponse;
 
 public interface AuthenticationService {
 
-    AuthenticationResponse register(RegisterRequest request, boolean createdByAdmin, String token);
+    public AuthenticationResponse register(RegisterRequest request);
     AuthenticationResponse authenticate(AuthenticationRequest request);
 
     public User getUserById(Long id);
@@ -19,4 +19,5 @@ public interface AuthenticationService {
 
     public void changePassword(String email, String currentPassword, String newPassword);
 
+    public String generateOtp();
 }

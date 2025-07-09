@@ -27,7 +27,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableMethodSecurity
 public class SecurityConfiguration {
     /* * At the application startup, during configuration, spring security will try to look for a bean of type SecurityFilterChain
-        * this bean is responsible for configuring all the HTTP security of our application
+     * this bean is responsible for configuring all the HTTP security of our application
      */
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -73,7 +73,11 @@ public class SecurityConfiguration {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin("https://localhost:3000");
+        config.addAllowedOrigin("https://localhost:8888");
+        config.addAllowedOrigin("https://localhost:7777");
+        config.addAllowedOrigin("https://localhost:8080");
+        config.addAllowedOrigin("https://172.16.29.12");
         config.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.AUTHORIZATION,
                 HttpHeaders.CONTENT_TYPE,

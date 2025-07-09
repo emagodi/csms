@@ -1,19 +1,5 @@
 package zw.co.zetdc.controller;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import zw.co.zetdc.entities.User;
-import zw.co.zetdc.exception.AuthenticationException;
-import zw.co.zetdc.payload.request.AuthenticationRequest;
-import zw.co.zetdc.payload.request.RefreshTokenRequest;
-import zw.co.zetdc.payload.request.RegisterRequest;
-import zw.co.zetdc.payload.request.UserUpdateRequest;
-import zw.co.zetdc.payload.response.AuthenticationResponse;
-import zw.co.zetdc.payload.response.RefreshTokenResponse;
-import zw.co.zetdc.service.AuthenticationService;
-import zw.co.zetdc.service.JwtService;
-import zw.co.zetdc.service.RefreshTokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,18 +9,37 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
+import zw.co.zetdc.entities.User;
+import zw.co.zetdc.enums.TokenType;
+import zw.co.zetdc.exception.AuthenticationException;
+import zw.co.zetdc.exception.UserNotFoundException;
+import zw.co.zetdc.payload.request.*;
+import zw.co.zetdc.payload.response.AuthenticationResponse;
+import zw.co.zetdc.payload.response.RefreshTokenResponse;
+import zw.co.zetdc.repository.UserRepository;
+import zw.co.zetdc.service.AuthenticationService;
+import zw.co.zetdc.service.EmailService;
+import zw.co.zetdc.service.JwtService;
+import zw.co.zetdc.service.RefreshTokenService;
 
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 @Tag(name = "AUTHENTICATION", description = "The Authentication APIs. Contains operations like login, logout, refresh-token etc.")
@@ -53,24 +58,23 @@ public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
+    private final EmailService emailService;
+
+    private final UserRepository userRepository;
+
     @PostMapping("/register")
     @Operation(summary = "Register New User",
-            description = "Create new user by posting firstname, lastname, email, password, role, reference. ")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request,
-                                      @RequestParam boolean createdByAdmin,
-                                      @RequestHeader Map<String, String> headers) {
-        String authorizationValue = null;
-
-        if (headers.get("authorization") != null && headers.get("authorization").length() > 7) {
-            authorizationValue = headers.get("authorization").substring(7);
-        }
-        System.out.println(createdByAdmin);
+            description = "Create new user by posting firstname, lastname, email, password, role, etc.")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
-            AuthenticationResponse authenticationResponse = authenticationService.register(request, createdByAdmin, authorizationValue);
+            // Call the register method without admin logic
+            AuthenticationResponse authenticationResponse = authenticationService.register(request);
 
+            // Generate cookies for JWT and Refresh Token
             ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getAccessToken());
             ResponseCookie refreshTokenCookie = refreshTokenService.generateRefreshTokenCookie(authenticationResponse.getRefreshToken());
 
+            // Return the response with cookies
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                     .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
@@ -80,7 +84,7 @@ public class AuthenticationController {
             if (message != null) {
                 // Return Conflict status with a plain string message
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Email and or Reference already exists: " + message); // Return the duplicate entry message
+                        .body("Email and or accessNumber already exists: " + message); // Return the duplicate entry message
             }
             // Handle other DataIntegrityViolationException cases if necessary
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -231,6 +235,84 @@ public class AuthenticationController {
             // Handle the specific case for invalid old password
             return ResponseEntity.badRequest().body("Invalid old password.");
         }
+    }
+
+    @PostMapping("/verifyOtp")
+    public ResponseEntity<?> verifyOtp(@RequestBody OtpVerificationRequest otpRequest) {
+        log.info("Verifying OTP for user: {}", otpRequest.getEmail());
+
+        User user = userRepository.findByEmail(otpRequest.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // Check if OTP is valid and not expired
+        if (user.getOtp() == null || user.getOtpExpiry() == null || user.getOtpExpiry().isBefore(LocalDateTime.now())) {
+            log.warn("Invalid or expired OTP for user: {}", user.getEmail());
+            return ResponseEntity.badRequest().body("Invalid or expired OTP.");
+        }
+
+        if (user.getOtp().equals(otpRequest.getOtp())) {
+            // OTP verification successful, clear OTP
+            user.setOtp(null);
+            user.setOtpExpiry(null);
+            userRepository.save(user); // Save user changes to clear OTP
+
+            // Generate tokens
+            String jwt = jwtService.generateToken(user);
+            String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
+
+            // Extract roles
+            List<String> roles = user.getRole().getAuthorities()
+                    .stream()
+                    .map(SimpleGrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
+
+            // Build and return the response
+            return ResponseEntity.ok(AuthenticationResponse.builder()
+                    .accessToken(jwt)
+                    .roles(roles)
+                    .email(user.getEmail())
+                    .id(user.getId())
+                    .firstname(user.getFirstname())
+                    .lastname(user.getLastname())
+                    .district(user.getDistrict())
+                    .region(user.getRegion())
+                    .reference(user.getReference())
+                    .identity(user.getIdentity())
+                    .identityType(user.getIdentityType())
+                    .temporaryPassword(user.isTemporaryPassword())
+                    .message("User Authenticated Successfully")
+                    .refreshToken(refreshToken)
+                    .tokenType(TokenType.BEARER.name())
+                    .build());
+        } else {
+            log.warn("Invalid OTP entered for user: {}", user.getEmail());
+            return ResponseEntity.badRequest().body("Invalid OTP. Please try again.");
+        }
+    }
+
+    @PostMapping("/resend-otp")
+    @Operation(summary = "Resend OTP",
+            description = "Endpoint to resend OTP to the user's email.")
+    public ResponseEntity<String> resendOtp(@RequestBody OtpResendRequest otpRequest) {
+        log.info("Request to resend OTP for user: {}", otpRequest.getEmail());
+
+        User user = userRepository.findByEmail(otpRequest.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // Generate a new OTP
+        String newOtp = authenticationService.generateOtp();
+        user.setOtp(newOtp);
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5)); // Set new expiry time
+        userRepository.save(user); // Save the updated user with new OTP
+
+        // Send the new OTP to the user's email
+        String otpSubject = "ZETDC Customer Supplied Material";
+        String otpBody = "Your new OTP code is: " + newOtp;
+        MailBody mailBody = new MailBody(user.getEmail(), otpSubject, otpBody);
+        emailService.sendSimpleMessage(mailBody);
+
+        log.info("New OTP sent to user: {}", user.getEmail());
+        return ResponseEntity.ok("New OTP has been sent to your email.");
     }
 
 }

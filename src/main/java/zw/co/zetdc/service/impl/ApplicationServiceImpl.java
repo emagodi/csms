@@ -14,7 +14,6 @@ import zw.co.zetdc.payload.request.ApplicationLineItemsDto;
 import zw.co.zetdc.payload.response.ApplicationResponse;
 import zw.co.zetdc.repository.ApplicationRepository;
 import zw.co.zetdc.service.ApplicationService;
-import zw.co.zetdc.service.EmailService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,7 +25,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationRepository applicationRepository;
 
-    private final EmailService emailService;
+    private final EmailServiceImpl emailService;
 
 
     @Override
