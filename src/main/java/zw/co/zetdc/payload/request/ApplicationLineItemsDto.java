@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import zw.co.zetdc.enums.Status;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 
 @Data
@@ -22,8 +23,12 @@ public class ApplicationLineItemsDto {
     private String reason;
 
     private Integer totalQuantity;
-
     private BigDecimal itemTotalPrice;
-
     private String currency;
+
+    private Integer receivedQuantity;
+    private Integer approvedQuantity;
+    private Integer rejectedQuantity;
+    private Integer pendingQuantity;
+    private LocalDate deliveryDate;
 }

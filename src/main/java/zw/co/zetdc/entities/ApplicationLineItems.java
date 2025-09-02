@@ -8,6 +8,7 @@ import lombok.Setter;
 import zw.co.zetdc.enums.Status;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "application_line_items")
@@ -33,5 +34,15 @@ public class ApplicationLineItems {
     private BigDecimal itemTotalPrice;
 
     private String currency;
+
+    private Integer receivedQuantity;
+
+    private Integer approvedQuantity;
+
+    private Integer rejectedQuantity;
+
+    private Integer pendingQuantity;
+
+    private LocalDate deliveryDate;
 
 }

@@ -15,6 +15,7 @@ import zw.co.zetdc.payload.response.ApplicationResponse;
 import zw.co.zetdc.repository.ApplicationRepository;
 import zw.co.zetdc.service.ApplicationService;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -75,7 +76,11 @@ public class ApplicationServiceImpl implements ApplicationService {
         applicationLineItems.setPrice(applicationLineItemsDto.getPrice());
         applicationLineItems.setStatus(applicationLineItemsDto.getStatus());
         applicationLineItems.setReason(applicationLineItems.getReason());
-
+        applicationLineItems.setReceivedQuantity(applicationLineItemsDto.getReceivedQuantity());
+        applicationLineItems.setApprovedQuantity(applicationLineItemsDto.getApprovedQuantity());
+        applicationLineItems.setRejectedQuantity(applicationLineItemsDto.getRejectedQuantity());
+        applicationLineItems.setPendingQuantity(applicationLineItemsDto.getPendingQuantity());
+        applicationLineItems.setDeliveryDate(applicationLineItemsDto.getDeliveryDate());
         return applicationLineItems;
     }
 
@@ -139,7 +144,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
 
-    public Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status) {
+    public Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status, Integer receivedQuantity, Integer approvedQuantity, Integer rejectedQuantity, Integer pendingQuantity, LocalDate deliveryDate) {
         Application existingApplication = applicationRepository.findById(applicationId).orElse(null);
         if (existingApplication != null) {
             List<ApplicationLineItems> existingLineItems = existingApplication.getApplicationLineItemsList();

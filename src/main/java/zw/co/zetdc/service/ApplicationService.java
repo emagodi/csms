@@ -9,6 +9,7 @@ import zw.co.zetdc.enums.Status;
 import zw.co.zetdc.payload.request.ApplicationRequest;
 import zw.co.zetdc.payload.response.ApplicationResponse;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ApplicationService {
@@ -33,9 +34,7 @@ public interface ApplicationService {
 
     public Application getApplicationById(Long id);
 
-
-    Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status);
-
+    Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status, Integer receivedQuantity, Integer approvedQuantity, Integer rejectedQuantity, Integer pendingQuantity, LocalDate deliveryDate);
 
     List<Application> getApplicationBySearch(String createdby, Long applicationId);
 
