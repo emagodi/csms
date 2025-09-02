@@ -154,6 +154,12 @@ public class ApplicationServiceImpl implements ApplicationService {
                 if (existingLineItem.getId().equals(lineItemId)) {
                     existingLineItem.setReason(reason);
                     existingLineItem.setStatus(status);
+                    existingLineItem.setReceivedQuantity(receivedQuantity);
+                    existingLineItem.setApprovedQuantity(approvedQuantity);
+                    existingLineItem.setRejectedQuantity(rejectedQuantity);
+                    existingLineItem.setPendingQuantity(pendingQuantity);
+                    existingLineItem.setDeliveryDate(deliveryDate);
+                    existingLineItem.setStoresStatus(storesStatus);
                     break;
                 }
             }
