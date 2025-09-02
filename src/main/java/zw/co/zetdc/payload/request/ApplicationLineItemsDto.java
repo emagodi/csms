@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import zw.co.zetdc.enums.Status;
+import zw.co.zetdc.enums.StoresStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,4 +32,6 @@ public class ApplicationLineItemsDto {
     private Integer rejectedQuantity;
     private Integer pendingQuantity;
     private LocalDate deliveryDate;
+
+    private StoresStatus storesStatus;
 }

@@ -9,6 +9,7 @@ import zw.co.zetdc.entities.ApplicationLineItems;
 import zw.co.zetdc.enums.District;
 import zw.co.zetdc.enums.Region;
 import zw.co.zetdc.enums.Status;
+import zw.co.zetdc.enums.StoresStatus;
 import zw.co.zetdc.payload.request.ApplicationRequest;
 import zw.co.zetdc.payload.request.ApplicationLineItemsDto;
 import zw.co.zetdc.payload.response.ApplicationResponse;
@@ -81,6 +82,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         applicationLineItems.setRejectedQuantity(applicationLineItemsDto.getRejectedQuantity());
         applicationLineItems.setPendingQuantity(applicationLineItemsDto.getPendingQuantity());
         applicationLineItems.setDeliveryDate(applicationLineItemsDto.getDeliveryDate());
+        applicationLineItems.setStoresStatus(applicationLineItems.getStoresStatus());
         return applicationLineItems;
     }
 
@@ -144,7 +146,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
 
-    public Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status, Integer receivedQuantity, Integer approvedQuantity, Integer rejectedQuantity, Integer pendingQuantity, LocalDate deliveryDate) {
+    public Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status, Integer receivedQuantity, Integer approvedQuantity, Integer rejectedQuantity, Integer pendingQuantity, LocalDate deliveryDate, StoresStatus storesStatus) {
         Application existingApplication = applicationRepository.findById(applicationId).orElse(null);
         if (existingApplication != null) {
             List<ApplicationLineItems> existingLineItems = existingApplication.getApplicationLineItemsList();

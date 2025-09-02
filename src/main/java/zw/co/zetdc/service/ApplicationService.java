@@ -6,6 +6,7 @@ import zw.co.zetdc.entities.Application;
 import zw.co.zetdc.enums.District;
 import zw.co.zetdc.enums.Region;
 import zw.co.zetdc.enums.Status;
+import zw.co.zetdc.enums.StoresStatus;
 import zw.co.zetdc.payload.request.ApplicationRequest;
 import zw.co.zetdc.payload.response.ApplicationResponse;
 
@@ -34,7 +35,7 @@ public interface ApplicationService {
 
     public Application getApplicationById(Long id);
 
-    Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status, Integer receivedQuantity, Integer approvedQuantity, Integer rejectedQuantity, Integer pendingQuantity, LocalDate deliveryDate);
+    Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status, Integer receivedQuantity, Integer approvedQuantity, Integer rejectedQuantity, Integer pendingQuantity, LocalDate deliveryDate, StoresStatus storesStatus);
 
     List<Application> getApplicationBySearch(String createdby, Long applicationId);
 

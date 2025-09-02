@@ -3,6 +3,7 @@ package zw.co.zetdc.payload.request;
 
 import lombok.*;
 import zw.co.zetdc.enums.Status;
+import zw.co.zetdc.enums.StoresStatus;
 
 import java.time.LocalDate;
 
@@ -21,5 +22,6 @@ public class UpdateLineItemRequest {
     private Integer rejectedQuantity;
     private Integer pendingQuantity;
     private LocalDate deliveryDate;
+    private StoresStatus storesStatus;
 
 }
