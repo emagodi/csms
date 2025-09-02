@@ -296,7 +296,7 @@ public class ApplicationController {
 
     @PutMapping("/applications/{applicationId}/line-items/{lineItemId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('UPDATE_PRIVILEGE') and hasAnyRole('PROJECTENGINEER')")
+    @PreAuthorize("hasAuthority('UPDATE_PRIVILEGE') and hasAnyRole('PROJECTENGINEER', 'STORESCLERK')")
     public ResponseEntity<Application> updateLineItem(
             @PathVariable("applicationId") Long applicationId,
             @PathVariable("lineItemId") Long lineItemId,
