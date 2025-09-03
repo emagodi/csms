@@ -10,10 +10,8 @@ import zw.co.zetdc.enums.District;
 import zw.co.zetdc.enums.Region;
 import zw.co.zetdc.enums.Status;
 import zw.co.zetdc.enums.StoresStatus;
-import zw.co.zetdc.handlers.ReflectionUtils;
 import zw.co.zetdc.payload.request.ApplicationRequest;
 import zw.co.zetdc.payload.request.ApplicationLineItemsDto;
-import zw.co.zetdc.payload.request.UpdateLineItemRequest;
 import zw.co.zetdc.payload.response.ApplicationResponse;
 import zw.co.zetdc.repository.ApplicationRepository;
 import zw.co.zetdc.service.ApplicationService;
@@ -149,13 +147,36 @@ public class ApplicationServiceImpl implements ApplicationService {
 
 
     @Override
-    public Application updateLineItem(Long applicationId, Long lineItemId, UpdateLineItemRequest request) {
+    public Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status, Integer receivedQuantity, Integer approvedQuantity, Integer rejectedQuantity, Integer pendingQuantity, LocalDate deliveryDate, StoresStatus storesStatus) {
         Application existingApplication = applicationRepository.findById(applicationId).orElse(null);
         if (existingApplication != null) {
             List<ApplicationLineItems> existingLineItems = existingApplication.getApplicationLineItemsList();
             for (ApplicationLineItems existingLineItem : existingLineItems) {
                 if (existingLineItem.getId().equals(lineItemId)) {
-                    ReflectionUtils.copyNonNullValues(request, existingLineItem);
+                    if (reason != null) {
+                        existingLineItem.setReason(reason);
+                    }
+                    if (status != null) {
+                        existingLineItem.setStatus(status);
+                    }
+                    if (receivedQuantity != null) {
+                        existingLineItem.setReceivedQuantity(receivedQuantity);
+                    }
+                    if (approvedQuantity != null) {
+                        existingLineItem.setApprovedQuantity(approvedQuantity);
+                    }
+                    if (rejectedQuantity != null) {
+                        existingLineItem.setRejectedQuantity(rejectedQuantity);
+                    }
+                    if (pendingQuantity != null) {
+                        existingLineItem.setPendingQuantity(pendingQuantity);
+                    }
+                    if (deliveryDate != null) {
+                        existingLineItem.setDeliveryDate(deliveryDate);
+                    }
+                    if (storesStatus != null) {
+                        existingLineItem.setStoresStatus(storesStatus);
+                    }
                     break;
                 }
             }

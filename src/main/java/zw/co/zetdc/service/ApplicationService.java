@@ -36,7 +36,7 @@ public interface ApplicationService {
 
     public Application getApplicationById(Long id);
 
-    public Application updateLineItem(Long applicationId, Long lineItemId, UpdateLineItemRequest request);
+    public Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status, Integer receivedQuantity, Integer approvedQuantity, Integer rejectedQuantity, Integer pendingQuantity, LocalDate deliveryDate, StoresStatus storesStatus);
 
     List<Application> getApplicationBySearch(String createdby, Long applicationId);
 
