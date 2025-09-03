@@ -107,6 +107,15 @@ public class ApplicationController {
         return applicationService.getAllApplicationsByDistrictForStores(district);
     }
 
+
+    @GetMapping("/district/{district}/stores/partial")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole( 'STORESCLERK' )")
+    public List<Application> getStoresApplicationsByDistrictForInspectionPartial(@PathVariable("district") District district) {
+        return applicationService.getAllApplicationsByDistrictForStoresPartial(district);
+    }
+
+
     /**
      * Author: Kudakwashe E Koti
      * */
@@ -153,7 +162,6 @@ public class ApplicationController {
     public List<Application> getApplicationsByDistrictForStoresUpload(@PathVariable("district") District district) {
         return applicationService.getApplicationsByDistrictForStoresUpload(district);
     }
-
 
     /**
      * Author: Kudakwashe E Koti
