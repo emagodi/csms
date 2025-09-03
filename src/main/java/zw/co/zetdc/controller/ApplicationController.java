@@ -126,6 +126,15 @@ public class ApplicationController {
         return applicationService.getApplicationForStoresBySearch(district, applicationId);
     }
 
+
+    @GetMapping("/district/{district}/stores/search/partial/{applicationId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasRole( 'STORESCLERK')")
+    public List<Application> getApplicationsForStoresBySearchPartial(@PathVariable("district") District district, @PathVariable("applicationId") Long applicationId) {
+        return applicationService.getApplicationForStoresBySearchPartial(district, applicationId);
+    }
+
+
     /**
      * Author: Kudakwashe E Koti
      * */

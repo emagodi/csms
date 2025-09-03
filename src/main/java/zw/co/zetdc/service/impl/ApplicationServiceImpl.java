@@ -363,6 +363,22 @@ public class ApplicationServiceImpl implements ApplicationService {
                 : applications;
     }
 
+
+    @Override
+    public List<Application> getApplicationForStoresBySearchPartial(District district, Long applicationId) {
+        var apps = applicationRepository.findByDistrict(district.toString());
+
+        var applications = apps.stream()
+                .filter(application -> Objects.equals(application.getId(), applicationId))
+                .filter(application -> Objects.equals(application.getStatus(), Status.PARTIAL_DELIVERY))
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed()).collect(Collectors.toList());
+        log.info(String.valueOf(applications.isEmpty()));
+        return applications.isEmpty()
+                ? Collections.singletonList(Application.builder().email(null).build())
+                : applications;
+    }
+
+
     @Override
     public List<Application> getAllApplicationsByDistrictForStores(District district) {
         var apps = applicationRepository.findByDistrict(district.toString());

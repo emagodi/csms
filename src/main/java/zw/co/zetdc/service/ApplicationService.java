@@ -57,6 +57,8 @@ public interface ApplicationService {
 
     List<Application> getApplicationForStoresBySearch(District district, Long applicationId);
 
+    List<Application> getApplicationForStoresBySearchPartial(District district, Long applicationId);
+
     List<Application> getAllApplicationsByDistrictForStores(District district);
 
     List<Application> getAllApplicationsByDistrictForStoresPartial(District district);
