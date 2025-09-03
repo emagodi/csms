@@ -302,7 +302,10 @@ public class ApplicationController {
             @PathVariable("lineItemId") Long lineItemId,
             @RequestBody UpdateLineItemRequest request) {
 
-        Application updatedApplication = applicationService.updateLineItem(applicationId, lineItemId, request.getReason(), request.getStatus(), request.getReceivedQuantity(), request.getApprovedQuantity(), request.getRejectedQuantity(), request.getPendingQuantity(), request.getDeliveryDate(), request.getStoresStatus());
+        // Call the service with the entire request object
+        Application updatedApplication = applicationService.updateLineItem(applicationId, lineItemId, request);
+
+        // Return appropriate response based on the result
         if (updatedApplication != null) {
             return ResponseEntity.ok(updatedApplication);
         } else {

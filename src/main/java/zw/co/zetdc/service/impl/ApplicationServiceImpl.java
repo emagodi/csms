@@ -10,8 +10,10 @@ import zw.co.zetdc.enums.District;
 import zw.co.zetdc.enums.Region;
 import zw.co.zetdc.enums.Status;
 import zw.co.zetdc.enums.StoresStatus;
+import zw.co.zetdc.handlers.ReflectionUtils;
 import zw.co.zetdc.payload.request.ApplicationRequest;
 import zw.co.zetdc.payload.request.ApplicationLineItemsDto;
+import zw.co.zetdc.payload.request.UpdateLineItemRequest;
 import zw.co.zetdc.payload.response.ApplicationResponse;
 import zw.co.zetdc.repository.ApplicationRepository;
 import zw.co.zetdc.service.ApplicationService;
@@ -146,20 +148,14 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
 
-    public Application updateLineItem(Long applicationId, Long lineItemId, String reason, Status status, Integer receivedQuantity, Integer approvedQuantity, Integer rejectedQuantity, Integer pendingQuantity, LocalDate deliveryDate, StoresStatus storesStatus) {
+    @Override
+    public Application updateLineItem(Long applicationId, Long lineItemId, UpdateLineItemRequest request) {
         Application existingApplication = applicationRepository.findById(applicationId).orElse(null);
         if (existingApplication != null) {
             List<ApplicationLineItems> existingLineItems = existingApplication.getApplicationLineItemsList();
             for (ApplicationLineItems existingLineItem : existingLineItems) {
                 if (existingLineItem.getId().equals(lineItemId)) {
-                    existingLineItem.setReason(reason);
-                    existingLineItem.setStatus(status);
-                    existingLineItem.setReceivedQuantity(receivedQuantity);
-                    existingLineItem.setApprovedQuantity(approvedQuantity);
-                    existingLineItem.setRejectedQuantity(rejectedQuantity);
-                    existingLineItem.setPendingQuantity(pendingQuantity);
-                    existingLineItem.setDeliveryDate(deliveryDate);
-                    existingLineItem.setStoresStatus(storesStatus);
+                    ReflectionUtils.copyNonNullValues(request, existingLineItem);
                     break;
                 }
             }
@@ -289,8 +285,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                 ? Collections.singletonList(Application.builder().email(null).build())
                 : applications;
     }
-
-
 
 
     @Override
