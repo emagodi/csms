@@ -240,6 +240,22 @@ public class ApplicationController {
                     .collect(Collectors.groupingBy(Application::getStatus, Collectors.counting()));
     }
 
+
+
+    @GetMapping("/region/{region}/count")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE') and hasAnyRole('GENERALMANAGER' , 'MANAGINGDIRECTOR')")
+    public Map<Status, Long> getApplicationsByRegionByCount(@PathVariable("region") Region region) {
+        System.out.println("we are here");
+        var applications = applicationService.getNumApplicationsByRegion(region);
+
+        return applications.stream()
+                .collect(Collectors.groupingBy(Application::getStatus, Collectors.counting()));
+    }
+
+
+
+
     /**
      * Author: Kudakwashe E Koti
      * */

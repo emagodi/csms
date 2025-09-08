@@ -417,6 +417,17 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public List<Application> getNumApplicationsByRegion(Region region) {
+        String r = region.toString();
+        log.info(r);
+        return applicationRepository
+                .findByRegion(Region.valueOf(r))
+                .stream()
+                .sorted(Comparator.comparing(Application::getUpdatedBy).reversed())
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public boolean isRefNoPresent(String refNo) {
         return applicationRepository.existsByReferenceNo(refNo);
     }
